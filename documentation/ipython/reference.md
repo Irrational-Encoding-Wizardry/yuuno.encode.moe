@@ -1,3 +1,8 @@
+---
+prev: ./getting-started
+next: false
+---
+
 # Reference
 
 ## `%load_ext yuuno`

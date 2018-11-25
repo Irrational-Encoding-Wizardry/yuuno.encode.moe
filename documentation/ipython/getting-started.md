@@ -1,6 +1,6 @@
 ---
 prev: ./installation
-next: false
+next: ./reference
 ---
 
 # Getting started
