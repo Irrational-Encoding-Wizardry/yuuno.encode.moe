@@ -1,0 +1,17 @@
+{
+  "name": "yuuno.encode.moe",
+  "version": "1.1",
+  "description": "Docs for Yuuno",
+  "main": "index.js",
+  "author": "stuxcrystal",
+  "license": "GNU FDL",
+  "scripts": {
+    "dev": "vuepress dev documentation",
+    "build": "vuepress build documentation"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "less": "^3.8.1",
+    "less-loader": "^4.1.0"
+  }
+}
