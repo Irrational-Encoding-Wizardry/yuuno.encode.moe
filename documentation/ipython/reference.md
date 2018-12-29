@@ -1,6 +1,8 @@
 ---
 prev: ./getting-started
-next: false
+next: ./configuration
+title: Reference
+sidebarDepth: 2
 ---
 
 # Reference
@@ -9,17 +11,54 @@ next: false
 This command enables Yuuno.
 When you correctly install yuuno, the variables `vs` and `core` will be added to your local environment.
 
-## Magics for clip introspection
+## Magics for previewing and encoding
 
-### `%diff <clipA>, <clipB>` <Badge text="deprecated" type="error" />
-This commands allows to compare two clips. Clip-B is shown when you put your mouse over the image.
+The magics for previewing and encoding work like if they were actual console commands.
 
-This functionality will be merged into `%preview` starting with Yuuno 1.2.
+### vspreview <Badge text="1.2+" />
 
----
+The `%%vspreview`-magic shows a preview. It will remeber which frame was shown in the last run of this command.
 
-### `%preview <clip>`
+You can only use one `%%vspreview`-instance per Notebook.
+
+Command:
+* `%%vspreview [--main <OUTPUT-ID>] [--diff [<OUTPUT-ID>]] [--reset-core] [--isolate-variables]`
+
+Options:
+* `--main <OUTPUT-ID>` - This setting defines which output-index is to previewed.
+* `--diff [<OUTPUT-ID>]` - This setting defines which output-index you want to compare the preview with.
+* `--reset-core` - Create a new `vs.Core`-object before executing the script.
+* `--isolate-variables` - Make sure that changes to variables do not affect the entire console.
+
+### vspipe <Badge text="1.2+" />
+
+The `%%vspipe`-magic is a helper for `%encode` below. It behaves like `%%vspreview` but instead of previewing,
+the magic will encode the video.
+
+Command:
+* `%%vspipe [--outputindex <OUTPUT-ID>] [OPTIONS] | [<COMMAND>...]`
+
+Options:
+* `--outputindex <OUTPUT-ID>` - Which output-index should be encoded.
+* `--y4m` - Add YUV4MPEG headers to output
+* `--start N` - Set the output frame range (first frame)
+* `--end N` - Set the output frame range (last frame)
+* `--requests N` - Set the number of concurrent frame requests.
+* `--reset-core` - Create a new `vs.Core`-object before executing the script.
+* `--isolate-core` - Create a new `vs.Core`-object that is only running during the encode. Do not use with `--reset-core`
+* `--isolate-variables` - Make sure that changes to variables do not affect the entire console.
+
+
+## Lower-Level Magics for Previewing and Encoding
+
+### `%preview` and `%diff`
+
+Commands:
+* `%preview <clip>, [diff=<clipB>]`
+* `%diff <clipA>, <clipB>` <Badge text="deprecated" type="error" />
+
 This commands shows a preview of the clip.
+Whenn using `%diff` or the `diff`-parameter is given, the comparison-mode is activated.
 
 ---
 
@@ -47,62 +86,35 @@ If you have only one encode running, it will directly attach to to the encode.
 Otherwise it will show you a list of `id` and some information about the encode.
 Use the ID given by its output to attach to a specific encode.
 
-## Configuring Yuuno
+## Controlling your VapourSynth-Environment
 
-Jupyter provides a `%config` magic which you can use to configure Jupyter.
-Yuuno hooks into it so you can configure Yuuno using the same command.
+Yuuno allows extensive control of your VapourSynth environment.
 
-`%config` will show you a list of config-sections.  
-`%config <SECTION>` shows you a list of configuration options for that section.  
-`%config <SECTION>.<CONFIG>` shows you the current value.  
-`%config <SECTION>.<CONFIG>=<VALUE>` allows you to change the value.
+### `%reset_core`
 
-Here is a small list of potentially useful configuration values.
+By using `%reset_core` you tell Yuuno to enable a new vapoursynth-core dismissing the old one.
 
-### VapourSynth
+### `%%isolated_core`
 
-This section allows you to configure how VapourSynth and Yuuno work with each other.
+This command creates an isolated core that only exists during the cell the command is executed.
+This is mostly useless unless you combine it with an encode command.
 
-* `core_accept_lowercase` (Default: `False`) <Badge text="VapourSynth <= R44" type="error" vertical="middle" />  
-  All plugin names are case-insensitive.  
-  This option is ignored on VapourSynth R45 and onwards.
+## Running Scripts
 
-* `core_add_cache` (Default: `True`)  
-  Add a cache to all new VapourSynth-clips. It is never a good idea to set this to `False`
+Yuuno is capable of running existing vapoursynth scripts from Jupyter.
 
-* `core_max_cache_size` (Default: `None`)  
-  Configures how large the inline caches should be.
+To do that, you can run `%runvpy`. It will execute the script and return a dict with its outputs while making sure that
+your previous outputs remain untouched.
 
-* `core_num_threads` (Default: `num_processors`)  
-  Configures how many worker-threads VapourSynth will use.
+If you use `%%vspreview` or `%%vspipe`, a far more useful command is the lower-level `%execvpy`-magic which will not reset your
+outputs after a run. This allows you to run and encode any VapourSynth-Script as if it were a cell in Yuuno.
 
-* `merge_bands` (Default: `None`) <Badge text="Debug" type="warn" vertical="middle" />  
-  Configures how the RGB-planes are extracted by Yuuno.
+### `%execvpy [<PATH>...]`
 
-* `resizer` (Default: `'resize.Spline36'`)
-  Configures which resizer is to be used for converting from the frame-colorspace to
-  RGB24
+Executes a VapourSynth script inside Jupyter (but not inside your global namespace.
 
-* `post_processor` (Default: `None`)  
-  Set this to a function that takes an `RGB24`-clip and returns an `RGB24`-clip. This will be the
-  last function called when converting your clip from your color-space to RGB.
+### `%runvpy [<PATH>...]`
 
-* `prefer_props` (Default: `True`)  
-  When set to true, Yuuno will try to determine the correct YUV-Matrix by using the frame-props of
-  the frame to display.
+Executes a VapourSynth script inside Jupyter (but not inside your global namespace.)
 
-* `yuv_matrix` (Default: `'709'`)  
-  If Yuuno couldn't determine the correct YUV-Matrix from the frame-props, this value will be used
-  as fallback.
-
-### YuunoImageOutput
-
-* `icc_profile` (Default: `'sRGB'`)
-  When outputting `.png`, Yuuno will insert a color-profile to ensure all browsers display the image
-  the same way.
-
-  If it is set to `sRGB` it will use sRGB. Otherwise specifiy the path to an ICC Color-Profile.
-
-* `zlib_compression` (Default: `6`)  
-  Defines how good the `.png`-file will be compressed. `0` means no compression, `1` is the fastest expression
-  and `9` the slowest.
+It will restore your outputs before script execution and 

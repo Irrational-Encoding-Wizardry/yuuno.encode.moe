@@ -9,43 +9,68 @@ features:
   details: Yuuno provides a stable environment that does not lose your data when VapourSynth crashes.
 - title: Configurable
   details: Configure everything about your experience. From YUV to RGB conversions up to compression ratios.
-footer: FDL Licensed | Copyright (c) 2018 StuxCrystal <stuxcrystal@encode.moe>
 ---
-### Have an example
+# Have an example
 
-**Load a script!**
+## Load Yuuno
 
 <jupyter-cell cellno="1">
 <render-markdown>
 ``` python
 %load_ext yuuno
-clip = core.std.BlankClip(length=100000)
 ```
 </render-markdown>
 </jupyter-cell>
 
-**Play with it's output!**
+## Edit and run a script
 
 <jupyter-cell cellno="2">
 <render-markdown>
 ``` python
-%preview clip
+%vspreview
+clip = core.ffms2.Source("sintel-4k.mkv")
+clip.set_output()
 ```
 </render-markdown>
 <render-markdown slot="output">
-<img :src="$withBase('./assets/preview.png')" />
+<img :src="$withBase('./assets/vspreview.png')" />
 </render-markdown>
 </jupyter-cell>
 
-**Encode it when you're done!**
+
+## Compare two clips
 
 <jupyter-cell cellno="3">
 <render-markdown>
 ``` python
-%encode clip --y4m x264.exe --demuxer y4m - --frames {len(clip)} --output test.mkv
+%vspreview --diff
+clip = core.ffms2.Source("sintel-4k.mkv")
+clip.set_output()
+sobel = clip.resize.Spline36(format=vs.GRAY8)
+sobel = sobel.std.Sobel(scale=2)
+sobel = sobel.std.Binarize(64)
+sobel.set_output(1)
 ```
 </render-markdown>
 <render-markdown slot="output">
-<img :src="$withBase('./assets/encode.png')" />
+<mouse-over>
+    <img :src="$withBase('./assets/vspreview-diff-main.png')" slot="primary" />
+    <img :src="$withBase('./assets/vspreview-diff-comparison.png')" slot="secondary" />
+</mouse-over>
+</render-markdown>
+</jupyter-cell>
+
+## Encode it when you're done!
+
+<jupyter-cell cellno="4">
+<render-markdown>
+``` python
+%%vspipe --y4m | x264.exe --demuxer y4m -o test.mkv -
+clip = core.ffms2.Source("sintel-4k.mkv")
+clip.set_output()
+```
+</render-markdown>
+<render-markdown slot="output">
+<img :src="$withBase('./assets/vspipe.png')" />
 </render-markdown>
 </jupyter-cell>

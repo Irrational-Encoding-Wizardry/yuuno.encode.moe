@@ -1,6 +1,6 @@
 {
   "name": "yuuno.encode.moe",
-  "version": "1.1",
+  "version": "1.2",
   "description": "Docs for Yuuno",
   "main": "index.js",
   "author": "stuxcrystal",
@@ -11,6 +11,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@vuepress/plugin-active-header-links": "^1.0.0-alpha.0",
     "less": "^3.8.1",
     "less-loader": "^4.1.0"
   }

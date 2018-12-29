@@ -1,6 +1,7 @@
 ---
 prev: ./installation
 next: ./reference
+title: Getting started
 ---
 
 # Getting started
@@ -59,6 +60,8 @@ Before you can enjoy Yuuno, you need to explicitely enable it inside your Notebo
 After executing this command, `vs` and `core` will automatically be imported for you. This will make it easier
 for you to use Yuuno with VapourSynth.
 
+Yuuno can be used 
+
 ---
 
 Let's open a preview for a simple black clip:
@@ -66,30 +69,67 @@ Let's open a preview for a simple black clip:
 <jupyter-cell cellno="2">
 <render-markdown>
 ``` python
-clip = core.std.BlankClip(length=10000)
-%preview clip
+%%vspreview
+clip = core.ffms2.Source("sintel-4k.mkv")
+clip.set_output()
 ```
 </render-markdown>
 <render-markdown slot="output">
-<img :src="$withBase('../assets/preview.png')" />
+<img :src="$withBase('../assets/vspreview.png')" />
 </render-markdown>
 </jupyter-cell>
 
-By modifiying and adding stuff to your cell, you can create an encode script which you can then preview.
+`%%vspreview` tells Yuuno that you want to preview the output of the script. Unlike vsedit however
+you need to pass additional parameters to tell Yuuno to actually isolate your script from other scripts.
+
+Use this line isolate your script from other scripts:  
+
+<jupyter-cell cellno="3">
+<render-markdown>
+```python 
+%%vspreview --reset-core --isolate-variables
+clip = core.ffms2.Source("sintel-4k.mkv")
+clip.set_output()
+```
+</render-markdown>
+</jupyter-cell>
+
+In some cases you will want to compare two clips, you can do that too. You will see the comparison-clip
+when you mouse-over the preview-area.
+
+
+<jupyter-cell cellno="4">
+<render-markdown>
+```python 
+%%vspreview --reset-core --isolate-variables --diff
+clip = core.ffms2.Source("sintel-4k.mkv")
+clip.set_output()
+sobel = clip.std.Sobel(scale=2, planes=0)
+sobel.set_output(1)
+```
+</render-markdown>
+<mouse-over slot="output">
+    <img :src="$withBase('/assets/vspreview-diff2-main.png')" slot="primary" />
+    <img :src="$withBase('/assets/vspreview-diff2-comparison.jpg')" slot="secondary" />
+</mouse-over>
+</jupyter-cell>
 
 ---
 
 In the unlikely case you are ever satisfied with your result, you can then use 
-`%encode` to encode your clip. You will see an output of your script here.
+`%%vspipe` to encode your clip.
 
+Unlike the name suggsests, Yuuno does not use the underlying vspipe-binary and instead uses the [VideoNode.output](http://www.vapoursynth.com/doc/pythonreference.html?highlight=output#VideoNode.output)-method.
 
-<jupyter-cell cellno="3">
+<jupyter-cell cellno="5">
 <render-markdown>
 ``` python
-%encode clip x264 - --demuxer y4m -o test.mkv
+%%vspipe --y4m | x264 - --demuxer y4m -o test.mkv
+clip = core.ffms2.Source("sintel-4k.mkv")
+clip.set_output()
 ```
 </render-markdown>
 <render-markdown slot="output">
-<img :src="$withBase('../assets/encode.png')" />
+<img :src="$withBase('../assets/vspipe.png')" />
 </render-markdown>
 </jupyter-cell>
