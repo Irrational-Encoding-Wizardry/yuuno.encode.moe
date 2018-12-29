@@ -111,12 +111,12 @@ your previous outputs remain untouched.
 If you use `%%vspreview` or `%%vspipe`, a far more useful command is the lower-level `%execvpy`-magic which will not reset your
 outputs after a run. This allows you to run and encode any VapourSynth-Script as if it were a cell in Yuuno.
 
-### `%execvpy
+### %execvpy
 Command: `%execpvy [<COMMAND>...]`
 
 Executes a VapourSynth script inside Jupyter (but not inside your global namespace.
 
-### `%runvpy`
+### %runvpy
 Command: `%runvpy [<COMMAND>...]`
 
 Executes a VapourSynth script inside Jupyter (but not inside your global namespace.)
