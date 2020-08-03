@@ -93,8 +93,7 @@ Configures how the RGB-planes are extracted by Yuuno.
 ### `resizer`
 Default: `'resize.Spline36'`
 
-Configures which resizer is to be used for converting from the frame-colorspace to
-RGB24
+Defines the resizer to use when converting from YUV to RGB. It is essentially a function which takes the same arguments as a VapourSynth internal resizer. The clip is passed as the first argument, the rest of the arguments are passed using keywords. Yuuno will first try to match it to a VapourSynth-function defined by a plugin before attempting to import it from a module and treat it as a normal function. If the passed object is a callable, it will just use the callable.
 
 ### `post_processor`
 Default: `None`
