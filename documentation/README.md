@@ -27,7 +27,7 @@ features:
 <jupyter-cell cellno="2">
 <render-markdown>
 ``` python
-%vspreview
+%%vspreview
 clip = core.ffms2.Source("sintel-4k.mkv")
 clip.set_output()
 ```
@@ -43,7 +43,7 @@ clip.set_output()
 <jupyter-cell cellno="3">
 <render-markdown>
 ``` python
-%vspreview --diff
+%%vspreview
 clip = core.ffms2.Source("sintel-4k.mkv")
 clip.set_output()
 sobel = clip.resize.Spline36(format=vs.GRAY8)
